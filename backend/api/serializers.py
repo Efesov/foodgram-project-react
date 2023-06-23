@@ -275,7 +275,7 @@ class RecipeCreateSerializer(RecipeSerializer):
                 amount=current_amount
             )
         if created:
-            pass
+            obj.save()
 
     def validate(self, data):
         ingredients_list = []
@@ -302,13 +302,21 @@ class RecipeCreateSerializer(RecipeSerializer):
         return recipe
 
     def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.image = validated_data.get('image', instance.image)
+        instance.cooking_time = validated_data.get(
+            'cooking_time',
+            instance.cooking_time
+        )
         ingredients = validated_data.pop('ingredients_amount')
         tags = validated_data.pop('tags')
         instance.tags.clear()
         instance.ingredients.clear()
-        instance.tags.set(*tags)
+        instance.tags.add(*tags)
         self.save_ingredients(instance, ingredients)
-        return super().update(instance, validated_data)
+        instance.save()
+        return instance
 
     def to_representation(self, instance):
         return RecipeSerializer(instance, context=self.context).data
