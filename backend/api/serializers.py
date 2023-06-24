@@ -237,10 +237,7 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def get_recipes(self, obj):
         recipes = obj.recipes.all()[:3]
-        remaining_count = obj.recipes.count() - 3
-        serializer = RecipeSerializer(recipes, many=True, read_only=True).data
-        if remaining_count > 0:
-            serializer.data.append({'remaining_count': remaining_count})
+        serializer = RecipeSerializer(recipes, many=True, read_only=True)
         return serializer.data
 
 
