@@ -236,9 +236,14 @@ class FollowSerializer(serializers.ModelSerializer):
                 and user.follower.filter(author=author).exists())
 
     def get_recipes(self, obj):
-        recipes = obj.recipes.all()
+        recipes = obj.recipes.all()[:3]
         serializer = RecipeSerializer(recipes, many=True, read_only=True)
-        return serializer.data
+        data = serializer.data
+        if obj.recipes.count() > 3:
+            remaining_count = obj.recipes.count() - 3
+            data.append({'name': f'Еще {remaining_count} рецептов'})
+
+        return data
 
 
 class RecipeCreateSerializer(RecipeSerializer):
